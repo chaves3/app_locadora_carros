@@ -121,53 +121,42 @@ class ModeloController extends Controller
      * @param  \App\Models\Modelo  $modelo
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
-     {
-       
-        // $marca->update($request->all());
-        $modelo = $this->modelo->find($id);
+public function update(Request $request, $id)
+{
+    $modelo = $this->modelo->find($id);
 
-        if($modelo === null){
-            return response()->json(['erro' => 'Recurso editado não existe'], 404); //json
+    if($modelo === null){
+        return response()->json(['erro' => 'Recurso editado não existe'], 404);
+    }
+
+    // Validação para PATCH
+    if($request->method() === 'PATCH'){
+        $regrasDinamicas = [];
+        foreach ($modelo->rules() as $input => $regras) {
+            if (array_key_exists($input, $request->all())) {
+                $regrasDinamicas[$input] = $regras;
+            }
         }
+        $request->validate($regrasDinamicas, $modelo->feedback());
+    } else {
+        $request->validate($modelo->rules(), $modelo->feedback());
+    }
 
-        if($request->method() === 'PATCH'){
-                $regrasDinamicas = array();
-                //percorrendo todas as regras definidas no model
-                foreach ($modelo->rules() as $input => $regras) {
-                    if (array_key_exists($input, $request->all())) {
-                        $regrasDinamicas[$input] = $regras;
-                    }
-                }
-            $request->validatey($modelo->rules(), $modelo->feedback());
-        }else{
-            $request->validate($modelo->rules(), $modelo->feedback()); 
-        }
-
-        //remove o arquivo antigo caso um novo arquivo tenha sido enviado no request
-        if($request->file('imagem')){
-            Storage::disk('public')->delete($modelo->imagem);
-        }
-
+    // Atualiza a imagem somente se um novo arquivo for enviado
+    if($request->file('imagem')){
+        // Remove a imagem antiga
+        Storage::disk('public')->delete($modelo->imagem);
         $imagem = $request->file('imagem');
         $imagem_urn = $imagem->store('imagens/modelos', 'public');
-    
-        $modelo->fill($request->all());
         $modelo->imagem = $imagem_urn;
-        $modelo->save();
-        // $modelo->update([
-        //      'nome' => $request->nome,
-        //     'imagem' => $imagem_urn,
-        //     'marca_id' => $request->marca_id,
-        //     'numero_portas' => $request->numero_portas,
-        //     'lugares' => $request->lugares,
-        //     'air_bag' => $request->air_bag,
-        //     'abs' => $request->abs,
-        // ]);
-        
-        return response()->json($modelo, 200);
-       }
+    }
 
+    // Preenche os outros campos
+    $modelo->fill($request->except('imagem')); // evita sobrescrever imagem com null
+    $modelo->save();
+    
+    return response()->json($modelo, 200);
+}
 
     /**
      * Remove the specified resource from storage.

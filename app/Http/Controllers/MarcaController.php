@@ -165,13 +165,13 @@ class MarcaController extends Controller
      */
     public function destroy(Request $request, $id)
     {
-        //
         $marca = $this->marca->find($id);
-         if($marca === null){
-            return response()->json(['erro' => 'Recurso deletado não existe'], 404); //json
+        if($marca === null){
+            return response()->json(['erro' => 'Recurso deletado não existe'], 404);
         }
 
-        if($request->file('imagem')){
+        // Deleta a imagem se existir
+        if($marca->imagem){
             Storage::disk('public')->delete($marca->imagem);
         }
 

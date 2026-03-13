@@ -2,22 +2,21 @@
 
 namespace Database\Factories;
 
+use App\Models\Carro;
+use App\Models\Modelo;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-/**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Carro>
- */
 class CarroFactory extends Factory
 {
-    /**
-     * Define the model's default state.
-     *
-     * @return array<string, mixed>
-     */
+    protected $model = Carro::class;
+
     public function definition()
     {
         return [
-            //
+            'modelo_id' => Modelo::factory(),
+            'placa' => $this->faker->unique()->regexify('[A-Z]{3}[0-9]{4}'),
+            'disponivel' => $this->faker->boolean(),
+            'km' => $this->faker->numberBetween(0, 200000),
         ];
     }
 }

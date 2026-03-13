@@ -32,4 +32,28 @@ class Locacao extends Model
             'km_final' => 'nullable|integer|min:0' 
         ];
     }
+
+    public function feedback()
+    {
+        return [
+            'required' => 'O campo :attribute é obrigatório',
+            'carro_id.exists' => 'O carro informado não existe',
+            'cliente_id.exists' => 'O cliente informado não existe',
+            'data_final_previsto_periodo.after' => 'A data final prevista deve ser posterior à data de início',
+            'data_final_realizado_periodo.after' => 'A data final realizada deve ser posterior à data de início',
+            'valor_diaria.min' => 'O valor da diária deve ser maior ou igual a zero',
+            'km_inicial.min' => 'A quilometragem inicial deve ser maior ou igual a zero',
+            'km_final.min' => 'A quilometragem final deve ser maior ou igual a zero',
+        ];
+    }
+
+    public function cliente()
+    {
+        return $this->belongsTo(Cliente::class);
+    }
+
+    public function carro()
+    {
+        return $this->belongsTo(Carro::class);
+    }
 }

@@ -128,7 +128,7 @@ class ClienteController extends Controller
                         $regrasDinamicas[$input] = $regras;
                     }
                 }
-            $request->validatey($cliente->rules(), $cliente->feedback());
+            $request->validate($cliente->rules(), $cliente->feedback());
         }else{
             $request->validate($cliente->rules(), $cliente->feedback()); 
         }

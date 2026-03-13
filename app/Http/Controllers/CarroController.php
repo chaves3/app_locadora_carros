@@ -127,19 +127,17 @@ class CarroController extends Controller
             return response()->json(['erro' => 'Recurso editado não existe'], 404); //json
         }
 
-        if($request->method() === 'PATCH'){
-                $regrasDinamicas = array();
-                //percorrendo todas as regras definidas no model
-                foreach ($carro->rules() as $input => $regras) {
-                    if (array_key_exists($input, $request->all())) {
-                        $regrasDinamicas[$input] = $regras;
-                    }
+        if ($request->method() === 'PATCH') {
+            $regrasDinamicas = [];
+            foreach ($carro->rules() as $input => $regras) {
+                if (array_key_exists($input, $request->all())) {
+                    $regrasDinamicas[$input] = $regras;
                 }
-            $request->validatey($carro->rules(), $carro->feedback());
-        }else{
-            $request->validate($carro->rules(), $carro->feedback()); 
+            }
+            $request->validate($regrasDinamicas, $carro->feedback()); // ← usar $regrasDinamicas
+        } else {
+            $request->validate($carro->rules(), $carro->feedback());
         }
-
        
     
         //preencher o objeto marca com os dados do request
